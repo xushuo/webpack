@@ -8,18 +8,22 @@ var HtmlwebpackPlugin = require('html-webpack-plugin');
 var ROOT_PATH = path.resolve('./');
 var APP_PATH = path.resolve(ROOT_PATH,'app');
 var BUILD_PATH = path.resolve(ROOT_PATH,'build');
+var TEM_PATH = path.resolve(ROOT_PATH,'tpl');
 
 module.exports = {
     //项目的文件夹 可以直接用文件夹名称，默认会找index.js 也可以确定是哪个文件名字
     entry: {
         app:path.resolve(APP_PATH,'index.js'),
+        mobile:path.resolve(APP_PATH,'mobile.js'),
         //添加要打包在venders里面的库
         vendors:['jquery','moment']
     },
     //输出文件名，合并以后js会命名为bundle.js
     output:{
         path:BUILD_PATH,
-        filename: 'bundle.js'
+        //[name]代表entry的每一个键值
+        //[hash]版本控制
+        filename: '[name].[hash].bundle.js'
     },
     //添加我们的插件，会自动生成一个HTML文件
     plugins:[
@@ -28,7 +32,22 @@ module.exports = {
         //把入口文件里面的数组打包成vendors.js
         new webpack.optimize.CommonsChunkPlugin('vendors','vendors.js'),
         new HtmlwebpackPlugin({
-            title:'hello world app'
+            title:'hello world app',
+            template:path.resolve(TEM_PATH,'index.html'),
+            filename:'index.html',
+            //chunks这个参数告诉插件要引用entry里面哪个入口
+            chunks:['app','vendors'],
+            //要把script插入到标签中
+            inject:'body'
+        }),
+        new HtmlwebpackPlugin({
+            title:'hello world mobile',
+            template:path.resolve(TEM_PATH,'mobile.html'),
+            filename:'mobile.html',
+            //chunks这个参数告诉插件要引用entry里面哪个入口
+            chunks:['mobile','vendors'],
+            //要把script插入到标签中
+            inject:'body'
         })
     ],
     //显示出错代码的位置
